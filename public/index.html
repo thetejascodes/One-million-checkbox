@@ -13,43 +13,53 @@
     <main class="page">
         <section class="hero">
             <h1>One Million Checkboxes</h1>
+            <div class="status" id="status">Connecting...</div>
         </section>
 
-        <div id="checkbox-container">
-        </div>
+        <div id="checkbox-container"></div>
     </main>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        const checkboxContainer = document.getElementById('checkbox-container');
+        const container = document.getElementById('checkbox-container');
+        const status = document.getElementById('status');
+        const TOTAL = 1000000;
+
+        socket.on('connect', () => status.textContent = `Connected · ${TOTAL.toLocaleString()} checkboxes`)
+        socket.on('disconnect', () => status.textContent = 'Disconnected')
+
         window.addEventListener('load', async () => {
-            const response = await fetch('/checkboxes', { method: 'GET' })
-            const data = await response.json()
-            if (data && data.checkboxes) {
-                data.checkboxes.forEach((checked, index) => {
-                    const checkbox = document.createElement('input')
-                    checkbox.type = 'checkbox'
-                    checkbox.id = `checkbox-${index}`
-                    checkbox.checked = checked;
-                    checkbox.addEventListener('change', event => {
-                        const checked = event.target.checked
-                        console.log(`Checkboxes Changed ${index}  ${checked}`)
-                        socket.emit('client:checkbox:changed', { index, checked })
+            status.textContent = 'Loading...'
+
+            const response = await fetch('/checkboxes')
+            const { checked } = await response.json()
+
+            const fragment = document.createDocumentFragment()
+
+            for (let index = 0; index < TOTAL; index++) {
+                const checkbox = document.createElement('input')
+                checkbox.type = 'checkbox'
+                checkbox.id = `cb-${index}`
+                checkbox.checked = checked[index] === '1'
+
+                checkbox.addEventListener('change', (e) => {
+                    socket.emit('client:checkbox:changed', {
+                        index,
+                        checked: e.target.checked
                     })
-                                    checkboxContainer.appendChild(checkbox)
-
-
                 })
+
+                fragment.appendChild(checkbox)
             }
+
+            container.appendChild(fragment)
+            status.textContent = `Connected · ${TOTAL.toLocaleString()} checkboxes`
         })
-        socket.on('server:checkbox:changed', (data) => {
-            console.log(`Checkboxes Changed ${data.index}  ${data.checked}`)
-            const { index, checked } = data;
-            const checkbox = document.getElementById(`checkbox-${index}`)
-            if (checkbox) {
-                checkbox.checked = checked;
-            }
+
+        socket.on('server:checkbox:changed', ({ index, checked }) => {
+            const checkbox = document.getElementById(`cb-${index}`)
+            if (checkbox) checkbox.checked = checked
         })
     </script>
 </body>
