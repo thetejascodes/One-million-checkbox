@@ -1,3 +1,14 @@
+cat > README.md << 'EOF'
+# ⚡ One Million Checkboxes
+
+> Real-time distributed system — 1M checkboxes, sub-second latency, WebSockets + Redis Pub/Sub
+
+![Demo](https://img.shields.io/badge/demo-live-brightgreen) ![Node.js](https://img.shields.io/badge/Node.js-24+-blue) ![Socket.IO](https://img.shields.io/badge/Socket.IO-4.8+-black) ![Redis](https://img.shields.io/badge/Redis-Pub%2FSub-red) ![License](https://img.shields.io/badge/license-MIT-green)
+
+## 🌐 Live Demo
+**[https://angelic-energy-production.up.railway.app/](https://angelic-energy-production.up.railway.app/)**
+
+## 🏗️ Architecture
 ### How it works
 - Client toggles checkbox → WebSocket event fires
 - Server saves state to **Redis** (source of truth)
