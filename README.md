@@ -1,4 +1,3 @@
-cat > README.md << 'EOF'
 # ⚡ One Million Checkboxes
 
 > Real-time distributed system — 1M checkboxes, sub-second latency, WebSockets + Redis Pub/Sub
